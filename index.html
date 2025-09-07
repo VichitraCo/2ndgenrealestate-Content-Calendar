@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2nd Gen Real Estate - Content Calendar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The application is designed as an interactive dashboard to transform the static content calendar into a dynamic planning tool. The structure is thematic and task-oriented, rather than a simple chronological list, to enhance usability. It features a top-level summary of key metrics (total posts, content type breakdown), followed by a powerful filtering system. The core of the app is a tabbed interface allowing users to switch between a full calendar view, a sponsor-centric view, and a team-centric view. This structure was chosen because it allows the social media manager to not only see the timeline but also to quickly analyze the content mix, check sponsor post distribution, and review team-specific content, making strategic planning much easier than with a linear table. Clicking a post card opens a detailed modal, keeping the main view clean and scannable. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Full 50-post calendar. Goal: Organize & Explore. Viz: Interactive grid of post cards. Interaction: Click to expand details, filter by type/phase. Justification: A grid is more visually engaging than a table and filtering allows for targeted planning. Method: HTML/CSS/JS.
+        - Report Info: Content types (Reel, Photo, etc.). Goal: Analyze content mix. Viz: Bar Chart. Interaction: Hover for tooltips. Justification: A chart provides a quick, visual summary of the content strategy. Library: Chart.js.
+        - Report Info: Sponsor/Team lists. Goal: Organize & Relate. Viz: Clickable lists/tags. Interaction: Click to filter the main calendar. Justification: This creates a relational view, making it easy to track obligations for specific partners. Method: HTML/CSS/JS.
+        - Report Info: Individual post details. Goal: Inform. Viz: Modal window. Interaction: Click on a card to open. Justification: Keeps the main interface uncluttered while providing full details on demand. Method: HTML/CSS/JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            background-color: #FDFBF7;
+            font-family: 'Inter', sans-serif;
+        }
+        .active-tab {
+            border-color: #C0A080;
+            color: #C0A080;
+            background-color: #F5F1EC;
+        }
+        .inactive-tab {
+            border-color: transparent;
+            color: #7D7D7D;
+        }
+        .post-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .post-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .modal {
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+            opacity: 0;
+            visibility: hidden;
+        }
+        .modal.is-visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            transition: transform 0.3s ease-in-out;
+            transform: scale(0.95);
+        }
+        .modal.is-visible .modal-content {
+            transform: scale(1);
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="text-gray-800">
+
+    <div id="app" class="container mx-auto p-4 md:p-8">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-[#4A4A4A]">2nd Gen Real Estate</h1>
+            <p class="text-xl text-[#C0A080] mt-2">Interactive Content Calendar</p>
+        </header>
+
+        <main>
+            <section id="kpi" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 text-center">
+                    <h3 class="text-sm font-semibold text-gray-500">TOTAL POSTS</h3>
+                    <p id="total-posts" class="text-3xl font-bold text-[#4A4A4A]">50</p>
+                </div>
+                 <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 text-center">
+                    <h3 class="text-sm font-semibold text-gray-500">KEY EVENTS</h3>
+                    <p class="text-3xl font-bold text-[#4A4A4A]">3</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 text-center">
+                    <h3 class="text-sm font-semibold text-gray-500">SPONSORS</h3>
+                    <p class="text-3xl font-bold text-[#4A4A4A]">11</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 text-center">
+                    <h3 class="text-sm font-semibold text-gray-500">TEAMS</h3>
+                    <p class="text-3xl font-bold text-[#4A4A4A]">8</p>
+                </div>
+            </section>
+
+            <section class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-8">
+                <h3 class="text-lg font-bold text-center mb-4 text-[#4A4A4A]">Content Mix</h3>
+                <div class="chart-container relative mx-auto" style="max-width: 800px; height: 300px;">
+                    <canvas id="contentMixChart"></canvas>
+                </div>
+            </section>
+
+            <section id="filters" class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-8">
+                <h3 class="text-lg font-bold text-center mb-4 text-[#4A4A4A]">Explore the Calendar</h3>
+                <div class="flex flex-wrap justify-center gap-4">
+                     <select id="month-filter" class="filter-btn bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-700">
+                        <option value="all">All Months</option>
+                        <option value="September">September</option>
+                        <option value="October">October</option>
+                        <option value="November">November</option>
+                    </select>
+                    <select id="type-filter" class="filter-btn bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-700">
+                        <option value="all">All Content Types</option>
+                        <option value="Photo / Carousel">Photo / Carousel</option>
+                        <option value="Video / Reel">Video / Reel</option>
+                        <option value="Photo">Photo</option>
+                         <option value="Carousel">Carousel</option>
+                        <option value="Reel">Reel</option>
+                        <option value="Video">Video</option>
+                        <option value="Photo / Poll">Photo / Poll</option>
+                    </select>
+                    <button id="reset-filters" class="bg-[#C0A080] text-white px-4 py-2 rounded-md hover:bg-[#A98B70] transition">Reset Filters</button>
+                </div>
+            </section>
+            
+            <section id="calendar-view" class="mt-8">
+                 <div class="border-b border-gray-200 mb-6">
+                    <nav class="-mb-px flex justify-center space-x-4 md:space-x-8" aria-label="Tabs">
+                        <button class="tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm active-tab" data-tab="september">September</button>
+                        <button class="tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm inactive-tab" data-tab="october">October</button>
+                        <button class="tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm inactive-tab" data-tab="november">November</button>
+                    </nav>
+                </div>
+
+                <div id="calendar-content">
+                    <!-- Post cards will be injected here -->
+                </div>
+                 <p id="no-results" class="text-center text-gray-500 hidden py-8">No posts match the current filters.</p>
+            </section>
+        </main>
+    </div>
+
+    <div id="modal" class="fixed inset-0 z-50 overflow-y-auto modal">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div id="modal-content" class="bg-white rounded-lg shadow-xl w-full max-w-2xl modal-content">
+                <div class="p-6">
+                     <div class="flex justify-between items-start">
+                        <div>
+                            <p id="modal-date" class="text-sm text-gray-500"></p>
+                            <h2 id="modal-title" class="text-2xl font-bold mt-1 text-[#4A4A4A]"></h2>
+                        </div>
+                        <button id="close-modal" class="text-gray-400 hover:text-gray-600">&times;</button>
+                    </div>
+                    <div class="mt-4 space-y-4">
+                        <div>
+                           <h4 class="font-semibold text-[#C0A080]">Content Idea & Description</h4>
+                           <p id="modal-description" class="text-gray-700 mt-1"></p>
+                        </div>
+                         <div>
+                           <h4 class="font-semibold text-[#C0A080]">Visuals & Caption Notes</h4>
+                           <p id="modal-notes" class="text-gray-700 mt-1"></p>
+                        </div>
+                         <div>
+                           <h4 class="font-semibold text-[#C0A080]">Content Type</h4>
+                           <span id="modal-type" class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const calendarData = [
+                { date: "Sept 8", month: "September", post: 1, type: "Photo / Carousel", title: "The Big Reveal: Introducing the Logo.", description: "A carousel post showing the new '2ndgenrealestate' logo and the mission behind it.", notes: "A clean, modern logo design. Caption talks about the merger of three legacies and the start of something new. Use a catchy hashtag like #2ndGenRealEstate." },
+                { date: "Sept 9", month: "September", post: 2, type: "Video / Reel", title: "First Look: The Next Generation.", description: "A short, energetic reel (the pre-planned one) introducing the four kids and their shared vision.", notes: "Fast cuts of the four kids (Aayush, Shanaya, Soumya, Mihir) in various professional and casual settings. Use upbeat, trending audio." },
+                { date: "Sept 10", month: "September", post: 3, type: "Photo", title: "A Turf of Our Own.", description: "A 'pique curiosity' post that shows a sneak peek of the turf ground with a blurred-out or stylized image.", notes: "A shot of the cricket turf, possibly with a lens flare or filter. Caption: \"Something big is coming... and we're playing on our own field.\"" },
+                { date: "Sept 11", month: "September", post: 4, type: "Carousel", title: "The Countdown Begins.", description: "A carousel with graphics counting down the days until the auction night.", notes: "Graphic with \"10 Days to Go.\" Subsequent slides can hint at the auction, teams, or sponsors without revealing too much." },
+                { date: "Sept 12", month: "September", post: 5, type: "Photo", title: "Meet the Hosts.", description: "A group shot of the four founders with a caption about their excitement and vision for the tournament.", notes: "A professional, smiling group photo. Caption can be a quote from one of them about the project's goal." },
+                { date: "Sept 13", month: "September", post: 6, type: "Reel", title: "Behind the Scenes.", description: "A fun, informal reel showing the kids planning the tournament, picking team names, etc.", notes: "Quick cuts of them in a meeting, laughing, and making notes. Show the collaborative spirit." },
+                { date: "Sept 14", month: "September", post: 7, type: "Photo", title: "Who Will Be The Legends?", description: "A post teasing the names of the teams.", notes: "An image with the 8 team names in a cool font, maybe on a blurred cricket background." },
+                { date: "Sept 15", month: "September", post: 8, type: "Photo", title: "Sneak Peek of the Trophy.", description: "A close-up shot of a part of the trophy to build excitement.", notes: "Focus on a detail of the trophy. Caption: \"Every great battle needs a prize. What are they playing for?\"" },
+                { date: "Sept 16", month: "September", post: 9, type: "Photo / Poll", title: "Match Day Teaser.", description: "An engaging post asking followers to guess who will win the toss or the first match.", notes: "Two team logos side-by-side with a poll sticker in the story. Caption: \"The teams are ready. Who's your pick?\"" },
+                { date: "Sept 17", month: "September", post: 10, type: "Photo", title: "AUCTION NIGHT IS TODAY.", description: "A dynamic graphic announcing the start of the auction.", notes: "A bold, eye-catching graphic with the text \"Auction Night is HERE!\" Encourage people to join via live streams or stories." },
+                { date: "Sept 18", month: "September", post: 11, type: "Reel", title: "Arrivals at the Venue.", description: "A sports-style reel showing the main sponsors and players arriving in style.", notes: "Fast cuts of luxurious cars pulling up, sponsors and team captains walking in. Use a hype soundtrack. Tag the venue partner." },
+                { date: "Sept 19", month: "September", post: 12, type: "Carousel", title: "Auction Night Highlights.", description: "A post with a carousel of photos from the auction night.", notes: "Shots of the kids on stage, a player being auctioned off, the crowd's reaction, and candid moments." },
+                { date: "Sept 20", month: "September", post: 13, type: "Photo", title: "Meet Our Title Sponsor.", description: "A dedicated post introducing Reddy Realty.", notes: "A professional photo of the owner/logo of Reddy Realty. Caption talks about their support for the community and their vision." },
+                { date: "Sept 21", month: "September", post: 14, type: "Video", title: "Interview with Team Captain #1.", description: "A short video clip from an interview at the auction night.", notes: "Video of a team captain talking about their strategy or excitement. Caption provides a quote from the interview." },
+                { date: "Sept 22", month: "September", post: 15, type: "Photo", title: "Meet Our Venue Partner.", description: "A dedicated post introducing Shreeji Sharan Group of Companies.", notes: "An elegant photo of one of their real estate projects. Caption: \"Where grand events meet grandeur properties. We're proud to partner with Shreeji Sharan Group, the foundation of this spectacular night.\"" },
+                { date: "Sept 23", month: "September", post: 16, type: "Carousel", title: "The Draft Is In!", description: "A carousel post revealing the final team rosters with player headshots.", notes: "The first slide shows the team logo and name. Subsequent slides show a collage of the players." },
+                { date: "Sept 24", month: "September", post: 17, type: "Photo", title: "Meet Our Bat & Ball Sponsor.", description: "A dedicated post introducing New India Constructions.", notes: "A custom graphic showing a cricket bat and ball. Caption: \"Building the future of cricket, one bat and ball at a time. A big thank you to New India Constructions for their support!\"" },
+                { date: "Sept 25", month: "September", post: 18, type: "Carousel", title: "Legends by Mhatre & Goradia Realtors Team Reveal.", description: "The first of the 8 team introduction carousels.", notes: "A slide for the team's motto, followed by slides of the team roster and hosts. Use a consistent visual theme for all team posts." },
+                { date: "Sept 26", month: "September", post: 19, type: "Photo", title: "Meet Our Cap Sponsor.", description: "A dedicated post introducing Shree Ram Krushna Developers.", notes: "An image of a custom-designed cap. Caption: \"Capping off the best team with a developer that transforms spaces and enriches lives.\" Tag their tagline." },
+                { date: "Sept 27", month: "September", post: 20, type: "Video", title: "Interview with Team Captain #2.", description: "Another clip from the auction night interviews.", notes: "Clip of a different team captain sharing their thoughts on the auction." },
+                { date: "Sept 28", month: "September", post: 21, type: "Photo", title: "Meet Our Co Sponsor.", description: "A dedicated post introducing Kutir Group.", notes: "A professional image of a landmark they built. Caption: \"Building the community brick by brick, just like Kutir Group builds landmarks from foundation to reality.\"" },
+                { date: "Sept 29", month: "September", post: 22, type: "Carousel", title: "Hindustan Titans Team Reveal.", description: "A team introduction post.", notes: "Same format as the last team reveal. Showcases the roster and hosts." },
+                { date: "Sept 30", month: "September", post: 23, type: "Reel", title: "A Day in the Life.", description: "A reel showing one of the kids managing their real estate business, then a quick transition to them working on the tournament.", notes: "Juxtaposes their professional life with their personal passion project. Highlights the \"2nd gen\" aspect." },
+                { date: "Oct 1", month: "October", post: 24, type: "Photo", title: "Meet Our Drinks Sponsor.", description: "A dedicated post introducing The Hirani Group.", notes: "A graphic with a variety of drinks. Caption: \"Keeping the energy high, just like The Hirani Group keeps the real estate market moving.\"" },
+                { date: "Oct 2", month: "October", post: 25, type: "Carousel", title: "Navkar Royals Team Reveal.", description: "A team introduction post.", notes: "Team roster and headshots." },
+                { date: "Oct 3", month: "October", post: 26, type: "Photo", title: "Meet Our Food Sponsor.", description: "A dedicated post introducing Labharti Realities.", notes: "A graphic of delicious food. Caption: \"Satisfying your hunger for great food, and your hunger for a great home. Thank you, Labharti Realities!\" Tag their tagline." },
+                { date: "Oct 4", month: "October", post: 27, type: "Video", title: "Interview with a Player.", description: "A clip from an interview with a player from one of the teams.", notes: "Video of a player talking about their excitement or strategy for the tournament." },
+                { date: "Oct 5", month: "October", post: 28, type: "Photo", title: "Meet Our Jersey Sponsor.", description: "A dedicated post introducing Parsh Precious Lifestyles.", notes: "A photo of one of the team jerseys. Caption: \"Dressing the teams in style, because Parsh understands precious lifestyles.\"" },
+                { date: "Oct 6", month: "October", post: 29, type: "Carousel", title: "Sanghvi Smashers Team Reveal.", description: "A team introduction post.", notes: "Team roster and headshots." },
+                { date: "Oct 7", month: "October", post: 30, type: "Photo", title: "Meet Our Man of the Match Sponsor.", description: "A dedicated post introducing PNK Group.", notes: "A graphic with a cricket player silhouette. Caption: \"Celebrating excellence since 1994, PNK Group honors the 'Man of the Match'.\"" },
+                { date: "Oct 8", month: "October", post: 31, type: "Carousel", title: "Suvidha Warriors - Suvidha Lifespaces Team Reveal.", description: "A team introduction post.", notes: "Team roster and headshots." },
+                { date: "Oct 9", month: "October", post: 32, type: "Photo", title: "Meet Our Toss ka Boss Sponsor.", description: "A dedicated post introducing Ambit Realtors and Developers.", notes: "A graphic of a coin toss. Caption: \"Winning the toss is all about strategy and adding value, just like Ambit Realtors.\"" },
+                { date: "Oct 10", month: "October", post: 33, type: "Carousel", title: "Ambit Spartans Team Reveal.", description: "A team introduction post.", notes: "Team roster and headshots." },
+                { date: "Oct 11", month: "October", post: 34, type: "Photo", title: "Meet Our Trophy & Boundaries Sponsor.", description: "A dedicated post introducing Samarpan Homes and Developers.", notes: "An image of the trophy. Caption: \"The ultimate prize and every boundary hit is brought to you by Samarpan Homes.\"" },
+                { date: "Oct 12", month: "October", post: 35, type: "Carousel", title: "Friends Aces Team Reveal.", description: "A team introduction post.", notes: "Team roster and headshots." },
+                { date: "Oct 13", month: "October", post: 36, type: "Photo", title: "Unboxing the Jerseys.", description: "A flat-lay photo of all the team jerseys laid out side by side.", notes: "A well-lit, creative photo of the jerseys. Caption: \"The wait is almost over. Which one are you rooting for?\"" },
+                { date: "Oct 14", month: "October", post: 37, type: "Carousel", title: "Ummang Strikers Team Reveal.", description: "The final team introduction post.", notes: "Team roster and headshots." },
+                { date: "Oct 15", month: "October", post: 38, type: "Reel", title: "Team Anthem Teaser.", description: "A short reel with a snippet of a song or a beat for the tournament anthem.", notes: "A graphic with audio waves and text like \"Listen to the beat of the battle.\"" },
+                { date: "Oct 16", month: "October", post: 39, type: "Photo", title: "The Final Count Down.", description: "A post counting down the last 3 weeks until the matches.", notes: "A calendar graphic or a stylized text image saying \"3 Weeks to Go!\"" },
+                { date: "Oct 17", month: "October", post: 40, type: "Photo", title: "Guess the Captain.", description: "A post with a blurred photo of a team captain, encouraging followers to guess their identity.", notes: "A low-resolution or blurred image of a team captain. Story poll." },
+                { date: "Oct 18", month: "October", post: 41, type: "Photo", title: "Did You Know?", description: "A trivia post about one of the sponsors or a real estate factoid.", notes: "Graphic with an interesting fact. Connect it back to one of the real estate companies sponsoring." },
+                { date: "Oct 19", month: "October", post: 42, type: "Photo", title: "Player Profile Spotlight #1.", description: "A post dedicated to a key player from one of the teams.", notes: "A professional photo of a player. Caption includes a short bio and their stats." },
+                { date: "Oct 20", month: "October", post: 43, type: "Video", title: "A Call for Our Community.", description: "A heartfelt video from the kids talking about their dream of building a community and how this tournament is the first step.", notes: "A high-quality video of the four founders speaking to the camera." },
+                { date: "Oct 21", month: "October", post: 44, type: "Carousel", title: "The Sponsors Speak.", description: "A carousel with quotes from the different sponsors about why they chose to support this event.", notes: "Each slide has a quote and the sponsor's logo." },
+                { date: "Oct 22", month: "October", post: 45, type: "Photo", title: "Throwback to the Auction.", description: "A fun, candid photo from the auction night that hasn't been shared yet.", notes: "An 'inside look' photo that feels authentic. Caption: \"Still buzzing from the energy of the auction night!\"" },
+                { date: "Oct 23", month: "October", post: 46, type: "Photo", title: "Player Profile Spotlight #2.", description: "A post dedicated to another key player from a different team.", notes: "A professional photo of the player with their bio." },
+                { date: "Oct 24", month: "October", post: 47, type: "Reel", title: "Countdown to Match Day.", description: "A high-energy reel showing clips from practices or a highlight reel of a few players.", notes: "Fast cuts with action shots. Text overlay: \"11 Days to Go!\"" },
+                { date: "Oct 25", month: "October", post: 48, type: "Carousel", title: "Trophy & Fours and Sixes.", description: "A carousel highlighting the sponsor of the trophy and boundaries.", notes: "Slide 1: Trophy. Slide 2: A graphic with \"4s\" and \"6s.\"" },
+                { date: "Oct 26", month: "October", post: 49, type: "Photo", title: "The Teams Are Ready.", description: "A composite photo of all the team logos in a row.", notes: "A graphic showcasing all 8 team logos. Caption: \"The stage is set. The teams are ready. The countdown to November 4th begins now.\"" },
+                { date: "Oct 27", month: "October", post: 50, type: "Reel", title: "A Final Message.", description: "A reel where the four founders personally invite everyone to the match days.", notes: "The founders speak directly to the camera, inviting the audience to the final matches and talking about the community spirit." },
+                { date: "Nov 4", month: "November", post: "-", type: "Story / Live", title: "Match Day 1.", description: "Live updates throughout the day.", notes: "Stories with scores, photos of the action, polls, and live video." },
+                { date: "Nov 5", month: "November", post: "-", type: "Story / Live", title: "Match Day 2.", description: "Live updates throughout the day, including the final match and award ceremony.", notes: "Live updates, photos, and videos of the final moments." },
+                { date: "Nov 6", month: "November", post: "-", type: "Video / Reel", title: "Match Day Highlights Reel.", description: "A professionally edited reel of the tournament's best moments.", notes: "Slow-motion shots, great catches, sixes, and the winning moment." },
+                { date: "Nov 7", month: "November", post: "-", type: "Photo / Carousel", title: "The Champions.", description: "A post celebrating the winning team with photos from the award ceremony.", notes: "Team photo with the trophy." },
+                { date: "Nov 8", month: "November", post: "-", type: "Carousel", title: "Thank You, Sponsors.", description: "A final post with a collage of all the sponsors' logos, thanking them for their support.", notes: "A comprehensive graphic thanking all 11 sponsors." }
+            ];
+
+            const calendarContent = document.getElementById('calendar-content');
+            const monthFilter = document.getElementById('month-filter');
+            const typeFilter = document.getElementById('type-filter');
+            const resetFiltersBtn = document.getElementById('reset-filters');
+            const noResults = document.getElementById('no-results');
+            
+            const modal = document.getElementById('modal');
+            const closeModalBtn = document.getElementById('close-modal');
+            
+            const tabs = document.querySelectorAll('.tab');
+            let activeTab = 'september';
+
+            const renderCalendar = (posts) => {
+                calendarContent.innerHTML = '';
+                const postsForTab = posts.filter(post => post.month.toLowerCase() === activeTab);
+
+                if (postsForTab.length === 0) {
+                    noResults.classList.remove('hidden');
+                } else {
+                    noResults.classList.add('hidden');
+                }
+                
+                const monthContainer = document.createElement('div');
+                monthContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6';
+
+                postsForTab.forEach((post, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'post-card bg-white rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col cursor-pointer';
+                    card.innerHTML = `
+                        <div class="flex-grow">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-semibold text-[#C0A080]">${post.date}</span>
+                                <span class="text-xs font-medium ${post.post === '-' ? 'bg-blue-100 text-blue-800' : 'bg-gray-200 text-gray-800'} px-2 py-1 rounded-full">${post.post === '-' ? 'Event' : `Post #${post.post}`}</span>
+                            </div>
+                            <h3 class="font-bold text-md text-[#4A4A4A]">${post.title}</h3>
+                        </div>
+                        <div class="mt-3 pt-3 border-t border-gray-100">
+                             <span class="text-xs text-gray-500">${post.type}</span>
+                        </div>
+                    `;
+                    card.addEventListener('click', () => openModal(post));
+                    monthContainer.appendChild(card);
+                });
+                calendarContent.appendChild(monthContainer);
+            };
+
+            const openModal = (post) => {
+                document.getElementById('modal-date').textContent = `${post.date}, ${post.month}`;
+                document.getElementById('modal-title').textContent = post.title;
+                document.getElementById('modal-description').textContent = post.description;
+                document.getElementById('modal-notes').textContent = post.notes;
+                document.getElementById('modal-type').textContent = post.type;
+                modal.classList.add('is-visible');
+                document.body.classList.add('overflow-hidden');
+            };
+
+            const closeModal = () => {
+                modal.classList.remove('is-visible');
+                document.body.classList.remove('overflow-hidden');
+            };
+
+            const applyFilters = () => {
+                let filteredData = [...calendarData];
+                const month = monthFilter.value;
+                const type = typeFilter.value;
+
+                if (month !== 'all') {
+                    filteredData = filteredData.filter(p => p.month === month);
+                }
+                if (type !== 'all') {
+                    filteredData = filteredData.filter(p => p.type === type);
+                }
+
+                renderCalendar(filteredData);
+            };
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => {
+                        t.classList.remove('active-tab');
+                        t.classList.add('inactive-tab');
+                    });
+                    tab.classList.add('active-tab');
+                    tab.classList.remove('inactive-tab');
+                    activeTab = tab.dataset.tab;
+                    applyFilters();
+                });
+            });
+
+            monthFilter.addEventListener('change', applyFilters);
+            typeFilter.addEventListener('change', applyFilters);
+            resetFiltersBtn.addEventListener('click', () => {
+                monthFilter.value = 'all';
+                typeFilter.value = 'all';
+                applyFilters();
+            });
+
+            closeModalBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+            
+            const setupChart = () => {
+                const ctx = document.getElementById('contentMixChart').getContext('2d');
+                const typeCounts = calendarData.reduce((acc, post) => {
+                    acc[post.type] = (acc[post.type] || 0) + 1;
+                    return acc;
+                }, {});
+                
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(typeCounts),
+                        datasets: [{
+                            label: 'Number of Posts',
+                            data: Object.values(typeCounts),
+                            backgroundColor: '#F5F1EC',
+                            borderColor: '#C0A080',
+                            borderWidth: 2,
+                            borderRadius: 4,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                             x: {
+                                grid: {
+                                    display: false
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#E5E7EB'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: '#4A4A4A',
+                                titleFont: { size: 14, weight: 'bold' },
+                                bodyFont: { size: 12 },
+                                cornerRadius: 4,
+                                displayColors: false
+                            }
+                        }
+                    }
+                });
+            };
+
+            applyFilters();
+            setupChart();
+        });
+    </script>
+</body>
+</html>
