@@ -61,7 +61,7 @@
             <section id="kpi" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 text-center">
                     <h3 class="text-sm font-semibold text-gray-500">TOTAL POSTS</h3>
-                    <p id="total-posts" class="text-3xl font-bold text-[#333333]">50</p>
+                    <p id="total-posts" class="text-3xl font-bold text-[#333333]">0</p>
                 </div>
                  <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 text-center">
                     <h3 class="text-sm font-semibold text-gray-500">KEY EVENTS</h3>
@@ -95,13 +95,11 @@
                     </select>
                     <select id="type-filter" class="filter-btn bg-white border border-gray-300 rounded-md px-4 py-2 text-gray-700">
                         <option value="all">All Content Types</option>
-                        <option value="Photo / Carousel">Photo / Carousel</option>
-                        <option value="Video / Reel">Video / Reel</option>
-                        <option value="Photo">Photo</option>
-                         <option value="Carousel">Carousel</option>
+                        <option value="Post">Post</option>
                         <option value="Reel">Reel</option>
-                        <option value="Video">Video</option>
-                        <option value="Photo / Poll">Photo / Poll</option>
+                        <option value="Story / Live">Story / Live</option>
+                        <option value="Video / Reel">Video / Reel</option>
+                        <option value="Photo / Carousel">Photo / Carousel</option>
                     </select>
                     <button id="reset-filters" class="bg-[#A855F7] text-white px-4 py-2 rounded-md hover:bg-[#8A3ED0] transition">Reset Filters</button>
                 </div>
@@ -117,8 +115,7 @@
                 </div>
 
                 <div id="calendar-content">
-                    <!-- Post cards will be injected here -->
-                </div>
+                    </div>
                  <p id="no-results" class="text-center text-gray-500 hidden py-8">No posts match the current filters.</p>
             </section>
         </main>
@@ -133,7 +130,7 @@
                             <p id="modal-date" class="text-sm text-gray-500"></p>
                             <h2 id="modal-title" class="text-2xl font-bold mt-1 text-[#333333]"></h2>
                         </div>
-                        <button id="close-modal" class="text-gray-400 hover:text-gray-600">&times;</button>
+                        <button id="close-modal" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
                     </div>
                     <div class="mt-4 space-y-4">
                         <div>
@@ -156,57 +153,42 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // UPDATED calendar data with new schedule, re-numbered posts, and synthesized descriptions/notes.
             const calendarData = [
-                { date: "Sept 8", month: "September", post: 1, type: "Photo / Carousel", title: "The Big Reveal: Introducing the Logo.", description: "A carousel post showing the new '2ndgenrealestate' logo and the mission behind it.", notes: "A clean, modern logo design. Caption talks about the merger of three legacies and the start of something new. Use a catchy hashtag like #2ndGenRealEstate." },
-                { date: "Sept 9", month: "September", post: 2, type: "Video / Reel", title: "First Look: The Next Generation.", description: "A short, energetic reel (the pre-planned one) introducing the four kids and their shared vision.", notes: "Fast cuts of the four kids (Aayush, Shanaya, Soumya, Mihir) in various professional and casual settings. Use upbeat, trending audio." },
-                { date: "Sept 10", month: "September", post: 3, type: "Photo", title: "A Turf of Our Own.", description: "A 'pique curiosity' post that shows a sneak peek of the turf ground with a blurred-out or stylized image.", notes: "A shot of the cricket turf, possibly with a lens flare or filter. Caption: \"Something big is coming... and we're playing on our own field.\"" },
-                { date: "Sept 11", month: "September", post: 4, type: "Carousel", title: "The Countdown Begins.", description: "A carousel with graphics counting down the days until the auction night.", notes: "Graphic with \"10 Days to Go.\" Subsequent slides can hint at the auction, teams, or sponsors without revealing too much." },
-                { date: "Sept 12", month: "September", post: 5, type: "Photo", title: "Meet the Hosts.", description: "A group shot of the four founders with a caption about their excitement and vision for the tournament.", notes: "A professional, smiling group photo. Caption can be a quote from one of them about the project's goal." },
-                { date: "Sept 13", month: "September", post: 6, type: "Reel", title: "Behind the Scenes.", description: "A fun, informal reel showing the kids planning the tournament, picking team names, etc.", notes: "Quick cuts of them in a meeting, laughing, and making notes. Show the collaborative spirit." },
-                { date: "Sept 14", month: "September", post: 7, type: "Photo", title: "Who Will Be The Legends?", description: "A post teasing the names of the teams.", notes: "An image with the 8 team names in a cool font, maybe on a blurred cricket background." },
-                { date: "Sept 15", month: "September", post: 8, type: "Photo", title: "Sneak Peek of the Trophy.", description: "A close-up shot of a part of the trophy to build excitement.", notes: "Focus on a detail of the trophy. Caption: \"Every great battle needs a prize. What are they playing for?\"" },
-                { date: "Sept 16", month: "September", post: 9, type: "Photo / Poll", title: "Match Day Teaser.", description: "An engaging post asking followers to guess who will win the toss or the first match.", notes: "Two team logos side-by-side with a poll sticker in the story. Caption: \"The teams are ready. Who's your pick?\"" },
-                { date: "Sept 17", month: "September", post: 10, type: "Photo", title: "AUCTION NIGHT IS TODAY.", description: "A dynamic graphic announcing the start of the auction.", notes: "A bold, eye-catching graphic with the text \"Auction Night is HERE!\" Encourage people to join via live streams or stories." },
-                { date: "Sept 18", month: "September", post: 11, type: "Reel", title: "Arrivals at the Venue.", description: "A sports-style reel showing the main sponsors and players arriving in style.", notes: "Fast cuts of luxurious cars pulling up, sponsors and team captains walking in. Use a hype soundtrack. Tag the venue partner." },
-                { date: "Sept 19", month: "September", post: 12, type: "Carousel", title: "Auction Night Highlights.", description: "A post with a carousel of photos from the auction night.", notes: "Shots of the kids on stage, a player being auctioned off, the crowd's reaction, and candid moments." },
-                { date: "Sept 20", month: "September", post: 13, type: "Photo", title: "Meet Our Title Sponsor.", description: "A dedicated post introducing Reddy Realty.", notes: "A professional photo of the owner/logo of Reddy Realty. Caption talks about their support for the community and their vision." },
-                { date: "Sept 21", month: "September", post: 14, type: "Video", title: "Interview with Team Captain #1.", description: "A short video clip from an interview at the auction night.", notes: "Video of a team captain talking about their strategy or excitement. Caption provides a quote from the interview." },
-                { date: "Sept 22", month: "September", post: 15, type: "Photo", title: "Meet Our Venue Partner.", description: "A dedicated post introducing Shreeji Sharan Group of Companies.", notes: "An elegant photo of one of their real estate projects. Caption: \"Where grand events meet grandeur properties. We're proud to partner with Shreeji Sharan Group, the foundation of this spectacular night.\"" },
-                { date: "Sept 23", month: "September", post: 16, type: "Carousel", title: "The Draft Is In!", description: "A carousel post revealing the final team rosters with player headshots.", notes: "The first slide shows the team logo and name. Subsequent slides show a collage of the players." },
-                { date: "Sept 24", month: "September", post: 17, type: "Photo", title: "Meet Our Bat & Ball Sponsor.", description: "A dedicated post introducing New India Constructions.", notes: "A custom graphic showing a cricket bat and ball. Caption: \"Building the future of cricket, one bat and ball at a time. A big thank you to New India Constructions for their support!\"" },
-                { date: "Sept 25", month: "September", post: 18, type: "Carousel", title: "Legends by Mhatre & Goradia Realtors Team Reveal.", description: "The first of the 8 team introduction carousels.", notes: "A slide for the team's motto, followed by slides of the team roster and hosts. Use a consistent visual theme for all team posts." },
-                { date: "Sept 26", month: "September", post: 19, type: "Photo", title: "Meet Our Cap Sponsor.", description: "A dedicated post introducing Shree Ram Krushna Developers.", notes: "An image of a custom-designed cap. Caption: \"Capping off the best team with a developer that transforms spaces and enriches lives.\" Tag their tagline." },
-                { date: "Sept 27", month: "September", post: 20, type: "Video", title: "Interview with Team Captain #2.", description: "Another clip from the auction night interviews.", notes: "Clip of a different team captain sharing their thoughts on the auction." },
-                { date: "Sept 28", month: "September", post: 21, type: "Photo", title: "Meet Our Co Sponsor.", description: "A dedicated post introducing Kutir Group.", notes: "A professional image of a landmark they built. Caption: \"Building the community brick by brick, just like Kutir Group builds landmarks from foundation to reality.\"" },
-                { date: "Sept 29", month: "September", post: 22, type: "Carousel", title: "Hindustan Titans Team Reveal.", description: "A team introduction post.", notes: "Same format as the last team reveal. Showcases the roster and hosts." },
-                { date: "Sept 30", month: "September", post: 23, type: "Reel", title: "A Day in the Life.", description: "A reel showing one of the kids managing their real estate business, then a quick transition to them working on the tournament.", notes: "Juxtaposes their professional life with their personal passion project. Highlights the \"2nd gen\" aspect." },
-                { date: "Oct 1", month: "October", post: 24, type: "Photo", title: "Meet Our Drinks Sponsor.", description: "A dedicated post introducing The Hirani Group.", notes: "A graphic with a variety of drinks. Caption: \"Keeping the energy high, just like The Hirani Group keeps the real estate market moving.\"" },
-                { date: "Oct 2", month: "October", post: 25, type: "Carousel", title: "Navkar Royals Team Reveal.", description: "A team introduction post.", notes: "Team roster and headshots." },
-                { date: "Oct 3", month: "October", post: 26, type: "Photo", title: "Meet Our Food Sponsor.", description: "A dedicated post introducing Labharti Realities.", notes: "A graphic of delicious food. Caption: \"Satisfying your hunger for great food, and your hunger for a great home. Thank you, Labharti Realities!\" Tag their tagline." },
-                { date: "Oct 4", month: "October", post: 27, type: "Video", title: "Interview with a Player.", description: "A clip from an interview with a player from one of the teams.", notes: "Video of a player talking about their excitement or strategy for the tournament." },
-                { date: "Oct 5", month: "October", post: 28, type: "Photo", title: "Meet Our Jersey Sponsor.", description: "A dedicated post introducing Parsh Precious Lifestyles.", notes: "A photo of one of the team jerseys. Caption: \"Dressing the teams in style, because Parsh understands precious lifestyles.\"" },
-                { date: "Oct 6", month: "October", post: 29, type: "Carousel", title: "Sanghvi Smashers Team Reveal.", description: "A team introduction post.", notes: "Team roster and headshots." },
-                { date: "Oct 7", month: "October", post: 30, type: "Photo", title: "Meet Our Man of the Match Sponsor.", description: "A dedicated post introducing PNK Group.", notes: "A graphic with a cricket player silhouette. Caption: \"Celebrating excellence since 1994, PNK Group honors the 'Man of the Match'.\"" },
-                { date: "Oct 8", month: "October", post: 31, type: "Carousel", title: "Suvidha Warriors - Suvidha Lifespaces Team Reveal.", description: "A team introduction post.", notes: "Team roster and headshots." },
-                { date: "Oct 9", month: "October", post: 32, type: "Photo", title: "Meet Our Toss ka Boss Sponsor.", description: "A dedicated post introducing Ambit Realtors and Developers.", notes: "A graphic of a coin toss. Caption: \"Winning the toss is all about strategy and adding value, just like Ambit Realtors.\"" },
-                { date: "Oct 10", month: "October", post: 33, type: "Carousel", title: "Ambit Spartans Team Reveal.", description: "A team introduction post.", notes: "Team roster and headshots." },
-                { date: "Oct 11", month: "October", post: 34, type: "Photo", title: "Meet Our Trophy & Boundaries Sponsor.", description: "A dedicated post introducing Samarpan Homes and Developers.", notes: "An image of the trophy. Caption: \"The ultimate prize and every boundary hit is brought to you by Samarpan Homes.\"" },
-                { date: "Oct 12", month: "October", post: 35, type: "Carousel", title: "Friends Aces Team Reveal.", description: "A team introduction post.", notes: "Team roster and headshots." },
-                { date: "Oct 13", month: "October", post: 36, type: "Photo", title: "Unboxing the Jerseys.", description: "A flat-lay photo of all the team jerseys laid out side by side.", notes: "A well-lit, creative photo of the jerseys. Caption: \"The wait is almost over. Which one are you rooting for?\"" },
-                { date: "Oct 14", month: "October", post: 37, type: "Carousel", title: "Ummang Strikers Team Reveal.", description: "The final team introduction post.", notes: "Team roster and headshots." },
-                { date: "Oct 15", month: "October", post: 38, type: "Reel", title: "Team Anthem Teaser.", description: "A short reel with a snippet of a song or a beat for the tournament anthem.", notes: "A graphic with audio waves and text like \"Listen to the beat of the battle.\"" },
-                { date: "Oct 16", month: "October", post: 39, type: "Photo", title: "The Final Count Down.", description: "A post counting down the last 3 weeks until the matches.", notes: "A calendar graphic or a stylized text image saying \"3 Weeks to Go!\"" },
-                { date: "Oct 17", month: "October", post: 40, type: "Photo", title: "Guess the Captain.", description: "A post with a blurred photo of a team captain, encouraging followers to guess their identity.", notes: "A low-resolution or blurred image of a team captain. Story poll." },
-                { date: "Oct 18", month: "October", post: 41, type: "Photo", title: "Did You Know?", description: "A trivia post about one of the sponsors or a real estate factoid.", notes: "Graphic with an interesting fact. Connect it back to one of the real estate companies sponsoring." },
-                { date: "Oct 19", month: "October", post: 42, type: "Photo", title: "Player Profile Spotlight #1.", description: "A post dedicated to a key player from one of the teams.", notes: "A professional photo of a player. Caption includes a short bio and their stats." },
-                { date: "Oct 20", month: "October", post: 43, type: "Video", title: "A Call for Our Community.", description: "A heartfelt video from the kids talking about their dream of building a community and how this tournament is the first step.", notes: "A high-quality video of the four founders speaking to the camera." },
-                { date: "Oct 21", month: "October", post: 44, type: "Carousel", title: "The Sponsors Speak.", description: "A carousel with quotes from the different sponsors about why they chose to support this event.", notes: "Each slide has a quote and the sponsor's logo." },
-                { date: "Oct 22", month: "October", post: 45, type: "Photo", title: "Throwback to the Auction.", description: "A fun, candid photo from the auction night that hasn't been shared yet.", notes: "An 'inside look' photo that feels authentic. Caption: \"Still buzzing from the energy of the auction night!\"" },
-                { date: "Oct 23", month: "October", post: 46, type: "Photo", title: "Player Profile Spotlight #2.", description: "A post dedicated to another key player from a different team.", notes: "A professional photo of the player with their bio." },
-                { date: "Oct 24", month: "October", post: 47, type: "Reel", title: "Countdown to Match Day.", description: "A high-energy reel showing clips from practices or a highlight reel of a few players.", notes: "Fast cuts with action shots. Text overlay: \"11 Days to Go!\"" },
-                { date: "Oct 25", month: "October", post: 48, type: "Carousel", title: "Trophy & Fours and Sixes.", description: "A carousel highlighting the sponsor of the trophy and boundaries.", notes: "Slide 1: Trophy. Slide 2: A graphic with \"4s\" and \"6s.\"" },
-                { date: "Oct 26", month: "October", post: 49, type: "Photo", title: "The Teams Are Ready.", description: "A composite photo of all the team logos in a row.", notes: "A graphic showcasing all 8 team logos. Caption: \"The stage is set. The teams are ready. The countdown to November 4th begins now.\"" },
-                { date: "Oct 27", month: "October", post: 50, type: "Reel", title: "A Final Message.", description: "A reel where the four founders personally invite everyone to the match days.", notes: "The founders speak directly to the camera, inviting the audience to the final matches and talking about the community spirit." },
+                // NEW SEPTEMBER POSTS (Post 1)
+                { date: "Sept 29", month: "September", post: 1, type: "Post", title: "Shreeji Sharan - Sponsors Logo", description: "A key sponsor post for Shreeji Sharan Group of Companies, focusing on their support for the tournament's venue.", notes: "Use an elegant graphic reflecting a strong foundation or building. Caption details their significant contribution." },
+                { date: "Sept 30", month: "September", post: 2, type: "Reel", title: "Suvidha Lifespaces - Team Owner", description: "A fast-paced reel introducing the owner or manager of the Suvidha Lifespaces team, setting the tone for their presence.", notes: "Upbeat, modern reel format. Feature a short quote or a powerful visual of the team owner with the team logo." },
+                
+                // NEW OCTOBER POSTS (Posts 3-30)
+                { date: "Oct 1", month: "October", post: 3, type: "Reel", title: "Ambit Spartans - Team Owner", description: "An aggressive and exciting reel introducing the Ambit Spartans team owner, focusing on their competitive spirit.", notes: "Use bold text overlays and dynamic camera movement. Caption should hype up the upcoming tournament." },
+                { date: "Oct 2", month: "October", post: 4, type: "Reel", title: "Friends Aces - Team Owner", description: "A friendly and engaging reel introducing the owner of the Friends Aces, highlighting teamwork and camaraderie.", notes: "Feature shots of the owner interacting with the team or the founders. Use positive, uplifting music." },
+                { date: "Oct 3", month: "October", post: 5, type: "Post", title: "Labharti Realities - Sponsors Logo", description: "A dedicated sponsor post featuring the Labharti Realities logo and a short message of appreciation.", notes: "Clean graphic with the logo. Caption highlights their commitment to the community/real estate sector." },
+                { date: "Oct 4", month: "October", post: 6, type: "Post", title: "Parsh - Sponsors Logo", description: "A professional post featuring the Parsh brand logo and acknowledging their role as a key lifestyle sponsor.", notes: "Use high contrast and clean lines for the logo presentation. Mention their connection to 'precious lifestyles'." },
+                { date: "Oct 6", month: "October", post: 7, type: "Post", title: "PNK Group - Sponsors Logo", description: "A spotlight post for PNK Group, thanking them for their sponsorship.", notes: "Feature their logo with their tagline. Emphasize their long-standing legacy or commitment to excellence." },
+                { date: "Oct 7", month: "October", post: 8, type: "Reel", title: "Legends - Team Owner", description: "A cinematic reel introducing the owner of the 'Legends' team, building mystique and excitement.", notes: "Use slow-motion and deep color grading. Caption hints at the legacy and experience brought by the owner." },
+                { date: "Oct 8", month: "October", post: 9, type: "Reel", title: "Umang Striker - Team Owner", description: "An energetic introduction reel for the Umang Strikers' team owner, emphasizing passion and dedication.", notes: "High-quality visual of the owner. Include team color/jersey elements. Use trending reel audio." },
+                { date: "Oct 9", month: "October", post: 10, type: "Post", title: "Samarpan - Sponsors Logo", description: "A thank you post for Samarpan Homes and Developers, focusing on their support for the tournament.", notes: "Logo presentation. Caption links Samarpan's dedication to home building with their dedication to the event." },
+                { date: "Oct 10", month: "October", post: 11, type: "Post", title: "Shree Ram Krushna - Sponsors Logo", description: "A dedicated post acknowledging Shree Ram Krushna Developers as a sponsor.", notes: "Clean, respectful logo visual. Caption should mention their vision and partnership with 2nd Gen Real Estate." },
+                { date: "Oct 11", month: "October", post: 12, type: "Post", title: "New India Constructions - Sponsors Logo", description: "A dedicated post showcasing the logo and thanking New India Constructions for their support as a key sponsor.", notes: "Use a clean, professional logo image. Caption focuses on their partnership and shared commitment to development." },
+                { date: "Oct 13", month: "October", post: 13, type: "Reel", title: "Jersey reel with sponsors", description: "A dynamic reel showcasing the final, official jerseys of all the teams, highlighting sponsor logos.", notes: "Fast cuts of close-ups on logos, the fabric, and the teams wearing them. High-energy music. Tag all jersey sponsors." },
+                { date: "Oct 14", month: "October", post: 14, type: "Reel", title: "BTS and closing of Auction - 3 hosts", description: "Behind-the-scenes reel capturing candid moments, interviews, and the wrap-up of the auction night with three of the hosts/founders.", notes: "Use quick interview snippets and funny, unscripted moments. Focus on the founders' final thoughts post-auction." },
+                { date: "Oct 15", month: "October", post: 15, type: "Reel", title: "Practise Play - showing the efforts teams are preparing", description: "An inspiring reel showing clips of various teams practicing and preparing for the tournament.", notes: "Focus on action, sweat, and intensity. Motivational music. Caption: 'The effort behind the glory.'" },
+                { date: "Oct 16", month: "October", post: 16, type: "Reel", title: "Meet: Title Sponsor", description: "A dedicated reel introducing and celebrating the Title Sponsor (Reddy Realty).", notes: "High-impact visuals of the sponsor's brand/owner. Use a voiceover to highlight their vision and partnership." },
+                { date: "Oct 17", month: "October", post: 17, type: "Reel", title: "Meet: Co-Title Sponsor", description: "A dedicated reel introducing the Co-Title Sponsor (Mhatre & Goradia Realtors).", notes: "Cinematic shots of their projects. Focus on the value and legacy they bring to the event." },
+                { date: "Oct 18", month: "October", post: 18, type: "Reel", title: "Meet: Food Sponsor", description: "A reel featuring the Food Sponsor (Labharti Realities) with a fun food/cricket tie-in.", notes: "Use quick, appetizing cuts of the food/beverages available at the event. Connect satisfaction with home ownership." },
+                { date: "Oct 20", month: "October", post: 19, type: "Reel", title: "Meet: Rudraksh, Akshit Jain", description: "A reel featuring a profile or interview with key personnel Rudraksh and Akshit Jain.", notes: "Focus on their excitement or involvement in the event. Use a formal yet energetic interview style." },
+                { date: "Oct 21", month: "October", post: 20, type: "Reel", title: "Breaking News First time ever", description: "A dramatic 'Breaking News' style reel announcing an exciting, unprecedented feature or prize for the tournament.", notes: "Use news-ticker style graphics and a serious, investigative tone, then a reveal of the surprise." },
+                { date: "Oct 22", month: "October", post: 21, type: "Post", title: "Meet the Team Captian - All captian", description: "A carousel post showcasing all team captains with a professional headshot and a quote from each.", notes: "High-quality, unified visual design for the carousel. Use a powerful, competitive quote for each caption." },
+                { date: "Oct 23", month: "October", post: 22, type: "Reel", title: "Turf sneak peek", description: "A high-quality, atmospheric reel showcasing the final, prepared cricket turf/venue.", notes: "Use cinematic shots, perhaps drone footage (if possible), or close-ups on the immaculate pitch. Hype up the venue." },
+                { date: "Oct 24", month: "October", post: 23, type: "Reel", title: "Meet: The youngest Player", description: "A feature reel highlighting the youngest player in the tournament.", notes: "Focus on their talent, excitement, and background. Inspiring background music." },
+                { date: "Oct 25", month: "October", post: 24, type: "Reel", title: "Interview of others (Player/Team Management)", description: "A short reel containing snippets from interviews with other key players or team managers.", notes: "Quick cuts, focused on strategy, preparation, and predictions for the match." },
+                { date: "Oct 27", month: "October", post: 25, type: "Reel", title: "Interview of others (Sponsors/Founders)", description: "A reel featuring quick, enthusiastic interviews with sponsors or founders about the upcoming match days.", notes: "Focus on community spirit and the scale of the final event." },
+                { date: "Oct 28", month: "October", post: 26, type: "Reel", title: "BTS of game day!", description: "A fun, fast-paced 'Behind the Scenes' reel showing all the logistical preparation for the match day.", notes: "Clips of banner setup, turf final touches, seating, and food prep. Build anticipation." },
+                { date: "Oct 29", month: "October", post: 27, type: "Post", title: "Game Night, gear up", description: "A static post/graphic serving as the final official reminder for the match days.", notes: "A bold, eye-catching graphic with the final date and location. Use a strong Call to Action (CTA)." },
+                { date: "Oct 30", month: "October", post: 28, type: "Post", title: "Countdown 3", description: "Day 3 Countdown post, emphasizing the imminent start of the tournament.", notes: "A simple, clean graphic: '3 Days to Go!'. Use team colors in the background." },
+                { date: "Oct 31", month: "October", post: 29, type: "Post", title: "Countdown 2", description: "Day 2 Countdown post, driving final engagement before the matches.", notes: "A simple, clean graphic: '2 Days to Go!'. Encourage last-minute predictions in the caption." },
+                
+                // Existing NOVEMBER EVENTS (non-numbered)
                 { date: "Nov 4", month: "November", post: "-", type: "Story / Live", title: "Match Day 1.", description: "Live updates throughout the day.", notes: "Stories with scores, photos of the action, polls, and live video." },
                 { date: "Nov 5", month: "November", post: "-", type: "Story / Live", title: "Match Day 2.", description: "Live updates throughout the day, including the final match and award ceremony.", notes: "Live updates, photos, and videos of the final moments." },
                 { date: "Nov 6", month: "November", post: "-", type: "Video / Reel", title: "Match Day Highlights Reel.", description: "A professionally edited reel of the tournament's best moments.", notes: "Slow-motion shots, great catches, sixes, and the winning moment." },
@@ -219,6 +201,7 @@
             const typeFilter = document.getElementById('type-filter');
             const resetFiltersBtn = document.getElementById('reset-filters');
             const noResults = document.getElementById('no-results');
+            const totalPostsElement = document.getElementById('total-posts');
             
             const modal = document.getElementById('modal');
             const closeModalBtn = document.getElementById('close-modal');
@@ -226,6 +209,7 @@
             const tabs = document.querySelectorAll('.tab');
             let activeTab = 'september';
 
+            // Function to filter and render posts
             const renderCalendar = (posts) => {
                 calendarContent.innerHTML = '';
                 const postsForTab = posts.filter(post => post.month.toLowerCase() === activeTab);
@@ -284,7 +268,16 @@
                     filteredData = filteredData.filter(p => p.month === month);
                 }
                 if (type !== 'all') {
-                    filteredData = filteredData.filter(p => p.type === type);
+                    // Normalize the comparison since the data sometimes uses specific types (e.g., 'Post')
+                    // and the filter uses general terms ('Post'/'Reel').
+                    if (type === 'Post') {
+                        filteredData = filteredData.filter(p => p.type.includes('Post'));
+                    } else if (type === 'Reel') {
+                         filteredData = filteredData.filter(p => p.type.includes('Reel'));
+                    } else {
+                         filteredData = filteredData.filter(p => p.type === type);
+                    }
+                   
                 }
 
                 renderCalendar(filteredData);
@@ -308,10 +301,21 @@
             resetFiltersBtn.addEventListener('click', () => {
                 monthFilter.value = 'all';
                 typeFilter.value = 'all';
+                // Reset tab to September after filter reset for clean start
+                tabs.forEach(t => {
+                    t.classList.remove('active-tab');
+                    t.classList.add('inactive-tab');
+                });
+                const septemberTab = document.querySelector('[data-tab="september"]');
+                septemberTab.classList.add('active-tab');
+                septemberTab.classList.remove('inactive-tab');
+                activeTab = 'september';
+
                 applyFilters();
             });
 
             closeModalBtn.addEventListener('click', closeModal);
+            // Close modal when clicking outside the content area
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
                     closeModal();
@@ -320,10 +324,22 @@
             
             const setupChart = () => {
                 const ctx = document.getElementById('contentMixChart').getContext('2d');
-                const typeCounts = calendarData.reduce((acc, post) => {
-                    acc[post.type] = (acc[post.type] || 0) + 1;
+                // Calculate counts for only numbered posts
+                const numberedPosts = calendarData.filter(p => p.post !== '-');
+                const typeCounts = numberedPosts.reduce((acc, post) => {
+                    // Group similar types for cleaner chart
+                    let type = post.type;
+                    if (type.includes('Post')) type = 'Post';
+                    if (type.includes('Reel')) type = 'Reel';
+                    if (type.includes('Video')) type = 'Video';
+                    if (type.includes('Story')) type = 'Story/Live';
+
+                    acc[type] = (acc[type] || 0) + 1;
                     return acc;
                 }, {});
+
+                // Update the total posts KPI
+                totalPostsElement.textContent = numberedPosts.length;
                 
                 new Chart(ctx, {
                     type: 'bar',
@@ -349,6 +365,9 @@
                             },
                             y: {
                                 beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1, // Ensure whole numbers for counts
+                                },
                                 grid: {
                                     color: '#E5E7EB'
                                 }
@@ -376,3 +395,4 @@
     </script>
 </body>
 </html>
+```eof
